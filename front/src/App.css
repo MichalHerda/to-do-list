@@ -1,0 +1,26 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* header = 15% wysokości ekranu */
+.app-header {
+  height: 25vh;
+  width: 100%;                  
+  display: flex;
+  justify-content: center;      
+  align-items: center;          
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* logo */
+.app-logo {
+  height: 120%;                  
+  object-fit: contain;
+}
+
+/* reszta strony */
+.app-content {
+  flex: 1;
+}
