@@ -87,6 +87,22 @@
   align-items: center;
 }
 
+.input-error {
+  border-color: #ff6b6b !important;
+  padding-bottom: 20px;
+}
+
+/* error w środku inputa */
+.auth-error {
+  position: absolute;
+  left: 12px;
+  bottom: 6px;
+
+  font-size: 0.75em;
+  color: #ff6b6b;
+  pointer-events: none;
+}
+
 /* input w password-field */
 .password-field input {
   width: 100%;
