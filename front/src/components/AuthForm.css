@@ -1,0 +1,138 @@
+/* kontener formularza */
+.auth-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  border: 1px solid #e0e0e0; /* spójny z header-content */
+  border-radius: 12px;
+  padding: 24px;
+  background-color: #1b1b1b; /* ciemne tło */
+}
+
+/* nagłówek */
+.auth-form h2 {
+  text-align: center;
+  color: #fff;
+}
+
+/* zwykłe inputy */
+.auth-form input {
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.auth-form input::placeholder {
+  color: #aaa;
+}
+
+/* checkbox stay logged in */
+.auth-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+/* submit button CTA */
+/* submit button CTA */
+.auth-form button[type="submit"] {
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 1em;
+  font-weight: 600;
+
+  color: #fff;
+  background-color: #2f2f2f;      /* ciemny, kontrastujący */
+  border: 1px solid #444;         /* spójny z inputami */
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: 
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+/* hover */
+.auth-form button[type="submit"]:hover {
+  background-color: #3a3a3a;
+  border-color: #555;
+}
+
+/* wciśnięcie - bardziej wyraźne */
+.auth-form button[type="submit"]:active {
+  transform: translateY(2px);      /* większe przesunięcie */
+  background-color: #242424;       /* ciemniejszy odcień przy kliknięciu */
+  border-color: #333;
+}
+
+/* focus-visible dla dostępności */
+.auth-form button[type="submit"]:focus-visible {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+
+/* password field wrapper */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* input w password-field */
+.password-field input {
+  width: 100%;
+  padding-right: 40px; /* miejsce na ikonę */
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+/* przycisk oka */
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent !important;
+  border: none !important;
+  color: #aaa !important;
+  cursor: pointer;
+  font-size: 1.1em;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #fff;
+}
+
+/* switch login/signup */
+.auth-switch {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.auth-switch span {
+  color: #646cff;
+  cursor: pointer;
+}
+
+.auth-switch span:hover {
+  text-decoration: underline;
+}

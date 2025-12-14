@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import './AuthForm.css' 
 
 function AuthForm({ onAuthSuccess }) {
   const [mode, setMode] = useState('login')
   const [stayLoggedIn, setStayLoggedIn] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const isLogin = mode === 'login'
 
@@ -23,11 +26,36 @@ function AuthForm({ onAuthSuccess }) {
 
       <input type="text" placeholder="Enter your name" />
 
-      <input type="password" placeholder="Enter password" />
+      <div className="password-field">
+        <input
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Enter password"
+        />
+        <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowPassword(prev => !prev)}
+            aria-label="Toggle password visibility"
+        >
+            {showPassword ? '🙈' : '👁️'}
+        </button>
+      </div>
 
-      {!isLogin && (
-        <input type="password" placeholder="Confirm password" />
-      )}
+      <div className="password-field">
+        <input
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder="Confirm password"
+        />
+        <button
+            type="button"
+            className="password-toggle"
+            onClick={() => setShowConfirmPassword(prev => !prev)}
+            aria-label="Toggle confirm password visibility"
+        >
+            {showConfirmPassword ? '🙈' : '👁️'}
+        </button>
+      </div>
+
 
       {isLogin && (
         <label className="auth-checkbox">
