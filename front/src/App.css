@@ -23,4 +23,91 @@
 /* reszta strony */
 .app-content {
   flex: 1;
+  width: 100%;
+  display: flex;              /* ⬅️ KLUCZ */
+  justify-content: center;    /* poziomo */
+  align-items: flex-start;   /* ⬅️ góra */
+  padding-top: 60px;   
+}
+
+.auth-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.auth-form {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.auth-form h2 {
+  text-align: center;
+}
+
+.auth-form input {
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.auth-form input::placeholder {
+  color: #aaa;
+}
+
+.auth-form button {
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 1em;
+  font-weight: 600;
+
+  color: #ffffff;
+  background-color: #3f46ff;       /* głęboki niebiesko-fiolet */
+  border: 1px solid #3f46ff;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: 
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.auth-form button:hover {
+  background-color: #4f55ff;
+  border-color: #4f55ff;
+}
+
+.auth-form button:focus-visible {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+
+
+.auth-switch {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.auth-switch span {
+  color: #646cff;
+  cursor: pointer;
+}
+
+.auth-switch span:hover {
+  text-decoration: underline;
 }

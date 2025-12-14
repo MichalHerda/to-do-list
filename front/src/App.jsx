@@ -1,4 +1,5 @@
 import './App.css'
+import AuthForm from './components/AuthForm'
 
 function App() {
   return (
@@ -11,8 +12,8 @@ function App() {
         />
       </header>
 
-      <main className="app-content">
-        {/* tutaj później: login / inne strony */}
+     <main className="app-content">
+        <AuthForm/>
       </main>
     </div>
   )
