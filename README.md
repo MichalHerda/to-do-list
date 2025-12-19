@@ -6,7 +6,7 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 
 - JWT-based authentication
 - Access & refresh token flow
-- Password hashing (bcrypt)
+- Password hashing (argon)
 - Protected API routes
 - Persistent login support
 

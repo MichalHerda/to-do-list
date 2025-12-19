@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from app.auth.schemas import SignupRequest, LoginRequest
 from app.auth.security import hash_password
+from app.auth.security import verify_password
 
 
 router = APIRouter(
@@ -30,6 +31,20 @@ def signup(data: SignupRequest):
 
 @router.post("/login")
 def login(data: LoginRequest):
+    user = fake_users_db.get(data.username)
+
+    if not user:
+        return {"error": "Invalid credentials"}
+
+    if not verify_password(data.password, user["password_hash"]):
+        return {"error": "Invalid credentials"}
+
     return {
         "message": f"user {data.username} logged in"
     }
+
+
+# for test only - delete later
+@router.get("/_debug/users")
+def list_users():
+    return fake_users_db
