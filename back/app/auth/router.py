@@ -1,7 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.auth.schemas import SignupRequest, LoginRequest
-from app.auth.security import hash_password
-from app.auth.security import verify_password
+from app.auth.security import (
+    hash_password,
+    verify_password,
+    create_access_token
+)
+
+from fastapi import Depends
+from app.auth.security import get_current_user
 
 
 router = APIRouter(
@@ -34,13 +40,18 @@ def login(data: LoginRequest):
     user = fake_users_db.get(data.username)
 
     if not user:
-        return {"error": "Invalid credentials"}
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     if not verify_password(data.password, user["password_hash"]):
-        return {"error": "Invalid credentials"}
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    access_token = create_access_token(
+        data={"sub": user["username"]}
+    )
 
     return {
-        "message": f"user {data.username} logged in"
+        "access_token": access_token,
+        "token_type": "bearer"
     }
 
 
@@ -48,3 +59,8 @@ def login(data: LoginRequest):
 @router.get("/_debug/users")
 def list_users():
     return fake_users_db
+
+
+@router.get("/me")
+def me(username: str = Depends(get_current_user)):
+    return {"username": username}
