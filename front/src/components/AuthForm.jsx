@@ -21,7 +21,7 @@ function AuthForm({ onAuthSuccess }) {
     if (!isLogin && password !== confirmPassword)
       return setError({ confirmPassword: 'Passwords do not match' })
     if (stayLoggedIn) localStorage.setItem('isAuthenticated', 'true')
-    onAuthSuccess?.()
+    onAuthSuccess?.(username)
   }
 
   const resetForm = () => {
