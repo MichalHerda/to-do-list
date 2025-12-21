@@ -1,50 +1,27 @@
 import { useState } from 'react'
-import './AuthForm.css'
 
 function AuthForm({ onAuthSuccess }) {
   const [mode, setMode] = useState('login')
   const [stayLoggedIn, setStayLoggedIn] = useState(false)
-
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
   const [error, setError] = useState({})
-
   const isLogin = mode === 'login'
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError({})
-
-    if (!username.trim()) {
-      setError({ username: 'Username is required' })
-      return
-    }
-
-    if (!password) {
-      setError({ password: 'Password is required' })
-      return
-    }
-
-    if (!isLogin && password.length < 5) {
-      setError({ password: 'Password must be at least 5 characters' })
-      return
-    }
-
-    if (!isLogin && password !== confirmPassword) {
-      setError({ confirmPassword: 'Passwords do not match' })
-      return
-    }
-
-    if (stayLoggedIn) {
-      localStorage.setItem('isAuthenticated', 'true')
-    }
-
-    onAuthSuccess()
+    if (!username.trim()) return setError({ username: 'Username is required' })
+    if (!password) return setError({ password: 'Password is required' })
+    if (!isLogin && password.length < 5)
+      return setError({ password: 'Password must be at least 5 characters' })
+    if (!isLogin && password !== confirmPassword)
+      return setError({ confirmPassword: 'Passwords do not match' })
+    if (stayLoggedIn) localStorage.setItem('isAuthenticated', 'true')
+    onAuthSuccess?.()
   }
 
   const resetForm = () => {
@@ -58,88 +35,87 @@ function AuthForm({ onAuthSuccess }) {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
-      <h2>{isLogin ? 'Login' : 'Sign up'}</h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <h2 className="text-center text-2xl font-bold">{isLogin ? 'Login' : 'Sign up'}</h2>
 
-      {/* USERNAME */}
-      <div className="field field-dynamic">
+      <input
+        type="text"
+        placeholder="Enter your name"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        className={`p-2 rounded border ${
+          error.username ? 'border-red-500' : 'border-gray-600'
+        } bg-gray-900 text-white`}
+      />
+      {error.username && <div className="text-red-500 text-sm">{error.username}</div>}
+
+      <div className="relative">
         <input
-          type="text"
-          placeholder="Enter your name"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className={error.username ? 'input-error' : ''}
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={`w-full p-2 rounded border ${
+            error.password ? 'border-red-500' : 'border-gray-600'
+          } bg-gray-900 text-white`}
         />
-        {error.username && <div className="auth-error">{error.username}</div>}
+        <button
+          type="button"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+          onClick={() => setShowPassword((p) => !p)}
+        >
+          {showPassword ? '🙈' : '👁️'}
+        </button>
       </div>
+      {error.password && <div className="text-red-500 text-sm">{error.password}</div>}
 
-      {/* PASSWORD */}
-      <div className="field field-dynamic">
-        <div className="password-field">
+      {!isLogin && (
+        <div className="relative">
           <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={error.password ? 'input-error' : ''}
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className={`w-full p-2 rounded border ${
+              error.confirmPassword ? 'border-red-500' : 'border-gray-600'
+            } bg-gray-900 text-white`}
           />
           <button
             type="button"
-            className="password-toggle"
-            onClick={() => setShowPassword(p => !p)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+            onClick={() => setShowConfirmPassword((p) => !p)}
           >
-            {showPassword ? '🙈' : '👁️'}
+            {showConfirmPassword ? '🙈' : '👁️'}
           </button>
         </div>
-        {error.password && <div className="auth-error">{error.password}</div>}
-      </div>
-
-      {/* CONFIRM PASSWORD — TYLKO SIGNUP */}
-      {!isLogin && (
-        <div className="field field-dynamic">
-          <div className="password-field">
-            <input
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className={error.confirmPassword ? 'input-error' : ''}
-            />
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={() => setShowConfirmPassword(p => !p)}
-            >
-              {showConfirmPassword ? '🙈' : '👁️'}
-            </button>
-          </div>
-          {error.confirmPassword && (
-            <div className="auth-error">{error.confirmPassword}</div>
-          )}
-        </div>
       )}
+      {error.confirmPassword && <div className="text-red-500 text-sm">{error.confirmPassword}</div>}
 
-      {/* STAY LOGGED IN — TYLKO LOGIN */}
       {isLogin && (
-        <label className="auth-checkbox">
+        <label className="flex items-center gap-2 text-gray-400 text-sm">
           <input
             type="checkbox"
             checked={stayLoggedIn}
             onChange={(e) => setStayLoggedIn(e.target.checked)}
+            className="w-4 h-4"
           />
           Stay logged in
         </label>
       )}
 
-      <button type="submit">
+      <button
+        type="submit"
+        className="mt-2 p-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold"
+      >
         {isLogin ? 'Login' : 'Sign up'}
       </button>
 
-      <p className="auth-switch">
+      <p className="text-center text-gray-400 text-sm mt-2">
         {isLogin ? (
           <>
             Don’t have an account?{' '}
             <span
+              className="text-blue-500 cursor-pointer hover:underline"
               onClick={() => {
                 setMode('signup')
                 resetForm()
@@ -152,6 +128,7 @@ function AuthForm({ onAuthSuccess }) {
           <>
             Already have an account?{' '}
             <span
+              className="text-blue-500 cursor-pointer hover:underline"
               onClick={() => {
                 setMode('login')
                 resetForm()

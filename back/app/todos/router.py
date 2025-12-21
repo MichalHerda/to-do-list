@@ -63,3 +63,18 @@ def update_todo(
             return todo
 
     raise HTTPException(status_code=404, detail="Todo not found")
+
+
+@router.delete("/{todo_id}")
+def delete_todo(
+    todo_id: int,
+    username: str = Depends(get_current_user)
+):
+    todos = fake_todos_db.get(username, [])
+
+    for i, todo in enumerate(todos):
+        if todo["id"] == todo_id:
+            todos.pop(i)
+            return {"message": "Todo deleted"}
+
+    raise HTTPException(status_code=404, detail="Todo not found")

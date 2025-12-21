@@ -10,3 +10,37 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - Protected API routes
 - Persistent login support
 
+## Frontend
+
+- React + Tailwind CSS
+- Modular components
+- Responsive layout
+
+## Backend
+
+- FastAPI
+- Pydantic models & validation
+- SQLite/PostgreSQL support via environment variables
+- Async CRUD operations
+
+## Setup & Run
+
+### Backend
+
+```bash
+cd back
+python -m venv venv
+source venv/bin/activate   # Linux 
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### Frontend
+
+```bash
+cd front
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 in your browser.
