@@ -11,18 +11,86 @@ function AuthForm({ onAuthSuccess }) {
   const [error, setError] = useState({})
   const isLogin = mode === 'login'
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    setError({})
-    if (!username.trim()) return setError({ username: 'Username is required' })
-    if (!password) return setError({ password: 'Password is required' })
-    if (!isLogin && password.length < 5)
-      return setError({ password: 'Password must be at least 5 characters' })
-    if (!isLogin && password !== confirmPassword)
-      return setError({ confirmPassword: 'Passwords do not match' })
-    if (stayLoggedIn) localStorage.setItem('isAuthenticated', 'true')
-    onAuthSuccess?.(username)
+  const API_URL = 'http://localhost:8000'
+
+const handleSubmit = async (e) => {
+  e.preventDefault()
+  setError({})
+
+  // WALIDACJE PODSTAWOWE
+  if (!username.trim()) return setError({ username: 'Username is required' })
+  if (!password) return setError({ password: 'Password is required' })
+  if (!isLogin && password.length < 5)
+    return setError({ password: 'Password must be at least 5 characters' })
+  if (!isLogin && password !== confirmPassword)
+    return setError({ confirmPassword: 'Passwords do not match' })
+
+  // LOGIN
+  if (isLogin) {
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      })
+
+      if (!res.ok) {
+        // backend odpowiada np. 401
+        throw new Error('Invalid credentials')
+      }
+
+      const data = await res.json()
+
+      // ZAPIS JWT
+      localStorage.setItem('access_token', data.access_token)
+
+      // PRZEKAZUJEMY STAN DO APP.JSX
+      onAuthSuccess?.(username)
+
+    } catch (err) {
+      setError({ password: 'Invalid username or password' })
+    }
+    return
   }
+// SIGNUP
+if (!isLogin) {
+  try {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      throw new Error(data.error || 'Signup failed')
+    }
+
+    // opcjonalnie: od razu zaloguj po signupie
+    const loginRes = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, password }),
+    })
+
+    const loginData = await loginRes.json()
+    localStorage.setItem('access_token', loginData.access_token)
+
+    onAuthSuccess?.(username)
+
+  } catch (err) {
+    setError({ username: err.message })
+  }
+}
+
+  
+}
 
   const resetForm = () => {
     setUsername('')
