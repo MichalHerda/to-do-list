@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import EmptyTodos from './EmptyTodos'
+import AddTodoModal from './AddTodoModal'
+import AddCategoryModal from './AddCategoryModal'
 
 function TodosPage() {
-  const [todos, setTodos] = useState(null) // null = not known
+  const [todos, setTodos] = useState(null)
+  const [showAddTodo, setShowAddTodo] = useState(false)
+  const [showAddCategory, setShowAddCategory] = useState(false)
+
   const token = localStorage.getItem('access_token')
 
   useEffect(() => {
@@ -13,39 +18,33 @@ function TodosPage() {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(res => {
-        if (!res.ok) throw new Error('Unauthorized')
-        return res.json()
-      })
-      .then(data => {
-        setTodos(data)
-      })
-      .catch(() => {
-        // if something goes wrong, we treat it as a lack of todos
-        setTodos([])
-      })
+      .then(res => res.json())
+      .then(setTodos)
+      .catch(() => setTodos([]))
   }, [token])
 
-  // 1️⃣ backend not answering yet
-  if (todos === null) {
+  if (todos === null) return <div>Loading...</div>
+
+  if (todos.length === 0) {
     return (
-      <div className="text-gray-400">
-        Loading todos...
-      </div>
+      <>
+        <EmptyTodos
+          onAddTodo={() => setShowAddTodo(true)}
+          onAddCategory={() => setShowAddCategory(true)}
+        />
+
+        {showAddTodo && (
+          <AddTodoModal onClose={() => setShowAddTodo(false)} />
+        )}
+
+        {showAddCategory && (
+          <AddCategoryModal onClose={() => setShowAddCategory(false)} />
+        )}
+      </>
     )
   }
 
-  // empty state
-  if (todos.length === 0) {
-    return <EmptyTodos />
-  }
-
-  // not empty todos list:
-  return (
-    <div className="text-gray-300">
-      Todo list will be rendered here ({todos.length} items)
-    </div>
-  )
+  return <div>Todo list later</div>
 }
 
 export default TodosPage
