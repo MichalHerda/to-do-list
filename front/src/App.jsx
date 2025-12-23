@@ -7,13 +7,29 @@ function App() {
   const [username, setUsername] = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    const savedUsername = localStorage.getItem('username')
-    if (token && savedUsername) {
+  const token = localStorage.getItem('access_token')
+  if (!token) return
+
+  fetch('http://localhost:8000/auth/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('Unauthorized')
+      return res.json()
+    })
+    .then(data => {
       setIsAuthenticated(true)
-      setUsername(savedUsername)
-    }
-  }, [])
+      setUsername(data.username)
+    })
+    .catch(() => {
+      // token nieprawidłowy / wygasł
+      localStorage.removeItem('access_token')
+      setIsAuthenticated(false)
+      setUsername(null)
+    })
+}, [])
 
   const handleAuthSuccess = (username) => {
     setIsAuthenticated(true)
