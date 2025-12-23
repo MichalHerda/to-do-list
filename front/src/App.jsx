@@ -1,35 +1,37 @@
 import { useState, useEffect } from 'react'
 import AuthForm from './components/AuthForm'
 import UserInfo from './components/UserInfo'
+import TodosPage from './components/todos/TodosPage'
+
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [username, setUsername] = useState(null)
 
   useEffect(() => {
-  const token = localStorage.getItem('access_token')
-  if (!token) return
+    const token = localStorage.getItem('access_token')
+    if (!token) return
 
-  fetch('http://localhost:8000/auth/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Unauthorized')
-      return res.json()
+    fetch('http://localhost:8000/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .then(data => {
-      setIsAuthenticated(true)
-      setUsername(data.username)
-    })
-    .catch(() => {
-      // token nieprawidłowy / wygasł
-      localStorage.removeItem('access_token')
-      setIsAuthenticated(false)
-      setUsername(null)
-    })
-}, [])
+      .then(res => {
+        if (!res.ok) throw new Error('Unauthorized')
+        return res.json()
+      })
+      .then(data => {
+        setIsAuthenticated(true)
+        setUsername(data.username)
+      })
+      .catch(() => {
+        // token invalid/expired
+        localStorage.removeItem('access_token')
+        setIsAuthenticated(false)
+        setUsername(null)
+      })
+  }, [])
 
   const handleAuthSuccess = (username) => {
     setIsAuthenticated(true)
@@ -58,7 +60,7 @@ function App() {
               <AuthForm onAuthSuccess={handleAuthSuccess} />
             </div>
           ) : (
-            <div className="text-gray-400">TODO LIST COMING NEXT 🚀</div>
+            <TodosPage />
           )}
         </div>
       </main>
