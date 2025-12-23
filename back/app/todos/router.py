@@ -28,6 +28,7 @@ def create_todo(
         "description": data.description or "",
         "completed": False,
         "category_id": data.category_id,
+        "due_date": data.due_date,
     }
 
     todo_id_counter += 1
@@ -59,6 +60,8 @@ def update_todo(
                 todo["completed"] = data.completed
             if data.category_id is not None:
                 todo["category_id"] = data.category_id
+            if data.due_date is not None:
+                todo["due_date"] = data.due_date
 
             return todo
 

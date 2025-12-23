@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 
 class TodoCreate(BaseModel):
     title: str
     description: Optional[str] = ""
     category_id: Optional[int] = None
+    due_date: Optional[datetime] = None
 
 
 class TodoUpdate(BaseModel):
@@ -13,6 +15,7 @@ class TodoUpdate(BaseModel):
     description: Optional[str] = None
     completed: Optional[bool] = None
     category_id: Optional[int] = None
+    due_date: Optional[datetime] = None
 
 
 class TodoOut(BaseModel):
@@ -21,3 +24,4 @@ class TodoOut(BaseModel):
     description: str
     completed: bool
     category_id: Optional[int]
+    due_date: Optional[datetime]

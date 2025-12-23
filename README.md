@@ -15,6 +15,7 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - React + Tailwind CSS
 - Modular components
 - Responsive layout
+- Date picker powered by react-datepicker
 
 ## Backend
 
