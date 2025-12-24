@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import EmptyTodos from './EmptyTodos'
 import AddTodoModal from './AddTodoModal'
 import AddCategoryModal from './AddCategoryModal'
+import TodosLayout from './TodosLayout'
 
 function TodosPage() {
   const [todos, setTodos] = useState(null)
@@ -44,7 +45,14 @@ function TodosPage() {
     )
   }
 
-  return <div>Todo list later</div>
+  return (
+    <TodosLayout
+      todos={todos}
+      onAddTodo={() => setShowAddTodo(true)}
+      onAddCategory={() => setShowAddCategory(true)}
+      onJumpToDate={() => console.log('jump to date')}
+    />
+  )
 }
 
 export default TodosPage
