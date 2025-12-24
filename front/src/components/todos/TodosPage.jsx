@@ -26,32 +26,32 @@ function TodosPage() {
 
   if (todos === null) return <div>Loading...</div>
 
-  if (todos.length === 0) {
-    return (
-      <>
+  return (
+    <>
+      {/* === MAIN CONTENT === */}
+      {todos.length === 0 ? (
         <EmptyTodos
           onAddTodo={() => setShowAddTodo(true)}
           onAddCategory={() => setShowAddCategory(true)}
         />
+      ) : (
+        <TodosLayout
+          todos={todos}
+          onAddTodo={() => setShowAddTodo(true)}
+          onAddCategory={() => setShowAddCategory(true)}
+          onJumpToDate={() => console.log('jump to date')}
+        />
+      )}
 
-        {showAddTodo && (
-          <AddTodoModal onClose={() => setShowAddTodo(false)} />
-        )}
+      {/* === MODALS (ALWAYS AVAILABLE) === */}
+      {showAddTodo && (
+        <AddTodoModal onClose={() => setShowAddTodo(false)} />
+      )}
 
-        {showAddCategory && (
-          <AddCategoryModal onClose={() => setShowAddCategory(false)} />
-        )}
-      </>
-    )
-  }
-
-  return (
-    <TodosLayout
-      todos={todos}
-      onAddTodo={() => setShowAddTodo(true)}
-      onAddCategory={() => setShowAddCategory(true)}
-      onJumpToDate={() => console.log('jump to date')}
-    />
+      {showAddCategory && (
+        <AddCategoryModal onClose={() => setShowAddCategory(false)} />
+      )}
+    </>
   )
 }
 
