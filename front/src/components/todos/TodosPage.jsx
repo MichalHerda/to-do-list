@@ -3,11 +3,14 @@ import EmptyTodos from './EmptyTodos'
 import AddTodoModal from './AddTodoModal'
 import AddCategoryModal from './AddCategoryModal'
 import TodosLayout from './TodosLayout'
+import CategoriesModal from '../categories/CategoriesModal'
+
 
 function TodosPage() {
   const [todos, setTodos] = useState(null)
   const [showAddTodo, setShowAddTodo] = useState(false)
-  const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showCategories, setShowCategories] = useState(false)
+
 
   const token = localStorage.getItem('access_token')
 
@@ -36,7 +39,7 @@ function TodosPage() {
       {todos.length === 0 ? (
         <EmptyTodos
           onAddTodo={() => setShowAddTodo(true)}
-          onAddCategory={() => setShowAddCategory(true)}
+          onAddCategory={() => setShowCategories(true)}
         />
       ) : (
         <TodosLayout
@@ -54,8 +57,8 @@ function TodosPage() {
         />
       )}
 
-      {showAddCategory && (
-        <AddCategoryModal onClose={() => setShowAddCategory(false)} />
+      {showCategories && (
+        <CategoriesModal onClose={() => setShowCategories(false)} />
       )}
     </>
   )
