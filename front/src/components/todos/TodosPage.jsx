@@ -11,6 +11,10 @@ function TodosPage() {
 
   const token = localStorage.getItem('access_token')
 
+  const handleTodoCreated = (newTodo) => {
+    setTodos(prev => [...prev, newTodo])
+  }
+
   useEffect(() => {
     if (!token) return
 
@@ -45,7 +49,9 @@ function TodosPage() {
 
       {/* === MODALS (ALWAYS AVAILABLE) === */}
       {showAddTodo && (
-        <AddTodoModal onClose={() => setShowAddTodo(false)} />
+        <AddTodoModal onClose={() => setShowAddTodo(false)} 
+        onTodoCreated={handleTodoCreated}
+        />
       )}
 
       {showAddCategory && (

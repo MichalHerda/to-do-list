@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
-function AddTodoModal({ onClose }) {
+function AddTodoModal({ onClose, onTodoCreated }) {
   const token = localStorage.getItem('access_token')
 
   const [title, setTitle] = useState('')
@@ -35,7 +35,7 @@ function AddTodoModal({ onClose }) {
   }, [token])
 
   const handleSubmit = async () => {
-    await fetch('http://localhost:8000/todos', {
+    const res = await fetch('http://localhost:8000/todos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +47,9 @@ function AddTodoModal({ onClose }) {
         category_id: categoryId,
       }),
     })
+    const newTodo = await res.json()
 
+    onTodoCreated(newTodo)
     onClose()
   }
 
