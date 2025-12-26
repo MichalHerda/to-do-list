@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
-function AddTodoModal({ onClose, onTodoCreated }) {
+function AddTodoModal({ onClose, onCreated }) {
   const token = localStorage.getItem('access_token')
 
   const [title, setTitle] = useState('')
@@ -20,7 +20,6 @@ function AddTodoModal({ onClose, onTodoCreated }) {
       .then(res => res.json())
       .then(data => {
         if (data.length === 0) {
-          // Fallback category when user has no categories yet
           setCategories([{ id: null, name: 'Default' }])
           setCategoryId(null)
         } else {
@@ -47,9 +46,10 @@ function AddTodoModal({ onClose, onTodoCreated }) {
         category_id: categoryId,
       }),
     })
+
     const newTodo = await res.json()
 
-    onTodoCreated(newTodo)
+    onCreated(newTodo)
     onClose()
   }
 
@@ -58,7 +58,6 @@ function AddTodoModal({ onClose, onTodoCreated }) {
       <div className="bg-gray-800 p-6 rounded w-96">
         <h3 className="text-lg mb-4">Add todo</h3>
 
-        {/* Todo title */}
         <input
           value={title}
           onChange={e => setTitle(e.target.value)}
@@ -66,7 +65,6 @@ function AddTodoModal({ onClose, onTodoCreated }) {
           placeholder="Todo title"
         />
 
-        {/* Due date */}
         <div className="mb-4">
           <DatePicker
             selected={dueDate}
@@ -77,7 +75,6 @@ function AddTodoModal({ onClose, onTodoCreated }) {
           />
         </div>
 
-        {/* Category select */}
         <select
           value={categoryId ?? ''}
           onChange={e => setCategoryId(e.target.value || null)}

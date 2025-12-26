@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import CategoryItem from './CategoryItem'
 
 function CategoriesModal({ categories, onCategoryAdded, onClose }) {
   const [name, setName] = useState('')
+  const [items, setItems] = useState(categories)
   const token = localStorage.getItem('access_token')
 
-  const handleSubmit = async (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault()
     if (!name.trim()) return
 
@@ -18,8 +20,19 @@ function CategoriesModal({ categories, onCategoryAdded, onClose }) {
     })
 
     const newCategory = await res.json()
+    setItems(prev => [...prev, newCategory])
     onCategoryAdded(newCategory)
     setName('')
+  }
+
+  const handleDelete = (id) => {
+    setItems(prev => prev.filter(c => c.id !== id))
+  }
+
+  const handleUpdate = (updated) => {
+    setItems(prev =>
+      prev.map(c => (c.id === updated.id ? updated : c))
+    )
   }
 
   return (
@@ -27,18 +40,18 @@ function CategoriesModal({ categories, onCategoryAdded, onClose }) {
       <div className="bg-gray-800 p-6 rounded w-full max-w-md max-h-[80vh] flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Categories</h3>
 
-        <ul className="space-y-2 overflow-y-auto flex-1 pr-1">
-          {categories.map(cat => (
-            <li
+        <div className="space-y-2 overflow-y-auto flex-1">
+          {items.map(cat => (
+            <CategoryItem
               key={cat.id}
-              className="px-3 py-2 bg-gray-700 rounded"
-            >
-              {cat.name}
-            </li>
+              category={cat}
+              onDelete={handleDelete}
+              onUpdated={handleUpdate}
+            />
           ))}
-        </ul>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleAdd} className="flex gap-2">
           <input
             value={name}
             onChange={e => setName(e.target.value)}
@@ -50,10 +63,7 @@ function CategoriesModal({ categories, onCategoryAdded, onClose }) {
           </button>
         </form>
 
-        <button
-          onClick={onClose}
-          className="w-full text-gray-400 hover:text-white"
-        >
+        <button onClick={onClose} className="text-gray-400">
           Close
         </button>
       </div>

@@ -1,7 +1,15 @@
 import TodosToolbar from './TodosToolbar'
 import TodosList from './TodosList'
 
-function TodosLayout({ todos, onAddTodo, onAddCategory, onJumpToDate }) {
+function TodosLayout({
+  todos,
+  categories,
+  onAddTodo,
+  onAddCategory,
+  onJumpToDate,
+  onTodoUpdated,
+  onTodoDeleted,
+}) {
   return (
     <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4">
       <TodosToolbar
@@ -10,7 +18,12 @@ function TodosLayout({ todos, onAddTodo, onAddCategory, onJumpToDate }) {
         onJumpToDate={onJumpToDate}
       />
 
-      <TodosList todos={todos} />
+      <TodosList
+        todos={todos}
+        categories={categories}
+        onTodoUpdated={onTodoUpdated}
+        onTodoDeleted={onTodoDeleted}
+      />
     </div>
   )
 }

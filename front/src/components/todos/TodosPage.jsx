@@ -16,6 +16,16 @@ function TodosPage() {
     setTodos(prev => [...prev, newTodo])
   }
 
+  const handleTodoUpdated = (updated) => {
+    setTodos(prev =>
+      prev.map(t => (t.id === updated.id ? updated : t))
+    )
+  }
+
+  const handleTodoDeleted = (id) => {
+    setTodos(prev => prev.filter(t => t.id !== id))
+  }
+
   const handleCategoryAdded = (newCategory) => {
     setCategories(prev => [...prev, newCategory])
   }
@@ -54,6 +64,8 @@ function TodosPage() {
           onAddTodo={() => setShowAddTodo(true)}
           onAddCategory={() => setShowCategories(true)}
           onJumpToDate={() => console.log('jump to date')}
+          onTodoUpdated={handleTodoUpdated}
+          onTodoDeleted={handleTodoDeleted}
         />
       )}
 
