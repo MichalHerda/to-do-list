@@ -26,7 +26,7 @@ function TodosList({ todos }) {
     <div
       ref={listRef}
       onScroll={handleScroll}
-      className="flex-1 overflow-y-auto py-4 space-y-2"
+      className="flex-1 overflow-y-auto py-4 space-y-2 bg-gray-900"
     >
       {todos.map(todo => (
         <TodoItem key={todo.id} todo={todo} />

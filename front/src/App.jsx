@@ -54,7 +54,7 @@ function App() {
 
       <main className="flex flex-col h-[80vh] w-full">
         {isAuthenticated && <UserInfo username={username} onLogout={handleLogout} />}
-        <div className="flex-1 flex justify-center items-center px-4">
+        <div className="flex-1 flex px-4 bg-gray-900">
           {!isAuthenticated ? (
             <div className="w-full max-w-md p-6 bg-gray-800 border border-gray-700 rounded-lg">
               <AuthForm onAuthSuccess={handleAuthSuccess} />

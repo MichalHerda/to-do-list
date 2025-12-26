@@ -33,10 +33,10 @@ function CategoriesModal({ onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
-      <div className="bg-gray-800 p-6 rounded w-96">
+      <div className="bg-gray-800 p-6 rounded w-96 max-h-[80vh] flex flex-col">
         <h3 className="text-lg mb-4">Categories</h3>
-
-        <div className="space-y-2">
+        
+        <div className="space-y-2 overflow-y-auto flex-1 pr-1">
           {categories.map(category => (
             <CategoryItem
               key={category.id}
@@ -47,16 +47,21 @@ function CategoriesModal({ onClose }) {
           ))}
         </div>
 
-        <button
-          onClick={() => setEditingCategory({})}
-          className="mt-4 bg-blue-600 px-4 py-2 rounded"
-        >
-          Add category
-        </button>
+        <div className="mt-4 flex justify-between items-center">
+          <button
+            onClick={() => setEditingCategory({})}
+            className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
+          >
+            Add category
+          </button>
 
-        <button onClick={onClose} className="ml-2">
-          Close
-        </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
+          >
+            Close
+          </button>
+        </div>
 
         {editingCategory && (
           <CategoryFormModal
