@@ -12,7 +12,7 @@ function TodosToolbar({ onAddTodo, onAddCategory, onJumpToDate }) {
         onClick={onAddCategory}
         className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
       >
-        Add Category
+        Categories
       </button>
 
       <button

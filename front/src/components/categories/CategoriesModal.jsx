@@ -1,76 +1,61 @@
-import { useEffect, useState } from 'react'
-import CategoryItem from './CategoryItem'
-import CategoryFormModal from './CategoryFormModal'
+import { useState } from 'react'
 
-function CategoriesModal({ onClose }) {
-  const [categories, setCategories] = useState([])
-  const [editingCategory, setEditingCategory] = useState(null)
+function CategoriesModal({ categories, onCategoryAdded, onClose }) {
+  const [name, setName] = useState('')
   const token = localStorage.getItem('access_token')
 
-  useEffect(() => {
-    fetch('http://localhost:8000/categories', {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!name.trim()) return
+
+    const res = await fetch('http://localhost:8000/categories', {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ name }),
     })
-      .then(res => res.json())
-      .then(setCategories)
-  }, [token])
 
-  const handleCreated = (category) => {
-    setCategories(prev => [...prev, category])
-  }
-
-  const handleUpdated = (updated) => {
-    setCategories(prev =>
-      prev.map(c => (c.id === updated.id ? updated : c))
-    )
-  }
-
-  const handleDeleted = (id) => {
-    setCategories(prev => prev.filter(c => c.id !== id))
+    const newCategory = await res.json()
+    onCategoryAdded(newCategory)
+    setName('')
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
-      <div className="bg-gray-800 p-6 rounded w-96 max-h-[80vh] flex flex-col">
-        <h3 className="text-lg mb-4">Categories</h3>
-        
-        <div className="space-y-2 overflow-y-auto flex-1 pr-1">
-          {categories.map(category => (
-            <CategoryItem
-              key={category.id}
-              category={category}
-              onEdit={setEditingCategory}
-              onDelete={handleDeleted}
-            />
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
+      <div className="bg-gray-800 p-6 rounded w-full max-w-md max-h-[80vh] flex flex-col gap-4">
+        <h3 className="text-lg font-semibold">Categories</h3>
+
+        <ul className="space-y-2 overflow-y-auto flex-1 pr-1">
+          {categories.map(cat => (
+            <li
+              key={cat.id}
+              className="px-3 py-2 bg-gray-700 rounded"
+            >
+              {cat.name}
+            </li>
           ))}
-        </div>
+        </ul>
 
-        <div className="mt-4 flex justify-between items-center">
-          <button
-            onClick={() => setEditingCategory({})}
-            className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
-          >
-            Add category
-          </button>
-
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
-          >
-            Close
-          </button>
-        </div>
-
-        {editingCategory && (
-          <CategoryFormModal
-            category={editingCategory}
-            onClose={() => setEditingCategory(null)}
-            onCreated={handleCreated}
-            onUpdated={handleUpdated}
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            className="flex-1 p-2 bg-gray-900 border border-gray-700 rounded"
+            placeholder="New category"
           />
-        )}
+          <button className="bg-blue-600 px-4 rounded">
+            Add
+          </button>
+        </form>
+
+        <button
+          onClick={onClose}
+          className="w-full text-gray-400 hover:text-white"
+        >
+          Close
+        </button>
       </div>
     </div>
   )

@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
 import EmptyTodos from './EmptyTodos'
 import AddTodoModal from './AddTodoModal'
-import AddCategoryModal from './AddCategoryModal'
-import TodosLayout from './TodosLayout'
 import CategoriesModal from '../categories/CategoriesModal'
-
+import TodosLayout from './TodosLayout'
 
 function TodosPage() {
   const [todos, setTodos] = useState(null)
+  const [categories, setCategories] = useState([])
   const [showAddTodo, setShowAddTodo] = useState(false)
   const [showCategories, setShowCategories] = useState(false)
-
 
   const token = localStorage.getItem('access_token')
 
@@ -18,24 +16,32 @@ function TodosPage() {
     setTodos(prev => [...prev, newTodo])
   }
 
+  const handleCategoryAdded = (newCategory) => {
+    setCategories(prev => [...prev, newCategory])
+  }
+
   useEffect(() => {
     if (!token) return
 
     fetch('http://localhost:8000/todos', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
       .then(setTodos)
       .catch(() => setTodos([]))
+
+    fetch('http://localhost:8000/categories', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(setCategories)
+      .catch(() => setCategories([]))
   }, [token])
 
   if (todos === null) return <div>Loading...</div>
 
   return (
     <>
-      {/* === MAIN CONTENT === */}
       {todos.length === 0 ? (
         <EmptyTodos
           onAddTodo={() => setShowAddTodo(true)}
@@ -44,21 +50,27 @@ function TodosPage() {
       ) : (
         <TodosLayout
           todos={todos}
+          categories={categories}
           onAddTodo={() => setShowAddTodo(true)}
-          onAddCategory={() => setShowAddCategory(true)}
+          onAddCategory={() => setShowCategories(true)}
           onJumpToDate={() => console.log('jump to date')}
         />
       )}
 
-      {/* === MODALS (ALWAYS AVAILABLE) === */}
       {showAddTodo && (
-        <AddTodoModal onClose={() => setShowAddTodo(false)} 
-        onTodoCreated={handleTodoCreated}
+        <AddTodoModal
+          onClose={() => setShowAddTodo(false)}
+          onCreated={handleTodoCreated}
+          categories={categories}
         />
       )}
 
       {showCategories && (
-        <CategoriesModal onClose={() => setShowCategories(false)} />
+        <CategoriesModal
+          categories={categories}
+          onCategoryAdded={handleCategoryAdded}
+          onClose={() => setShowCategories(false)}
+        />
       )}
     </>
   )
