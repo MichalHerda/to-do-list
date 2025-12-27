@@ -23,6 +23,7 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - Pydantic models & validation
 - SQLite/PostgreSQL support via environment variables
 - Async CRUD operations
+- SQLAlchemy ORM (async)
 
 ## Database
 

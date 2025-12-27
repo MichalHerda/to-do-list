@@ -4,6 +4,9 @@ from app.todos.router import router as todos_router
 from app.categories.router import router as categories_router
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.database import Base, engine                           # noqa: F401
+from app.models import User, Category, Todo                     # noqa: F401
+
 app = FastAPI()
 
 app.add_middleware(
