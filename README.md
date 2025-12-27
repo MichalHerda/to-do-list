@@ -24,6 +24,23 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - SQLite/PostgreSQL support via environment variables
 - Async CRUD operations
 
+## Database
+
+The backend supports multiple databases via environment configuration.
+
+Currently supported:
+- SQLite (default, local dev)
+- PostgreSQL (recommended for production & learning)
+
+Database connection is configured via `.env` file.
+
+## Environment variables
+
+Create a `.env` file in `/back`:
+
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/todo_db
+SECRET_KEY=your-secret-key
+
 ## Setup & Run
 
 ### Backend
