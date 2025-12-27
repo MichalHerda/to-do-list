@@ -9,56 +9,83 @@ from app.auth.security import (
 from fastapi import Depends
 from app.auth.security import get_current_user
 
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database import get_db
+from app.auth import crud
+
 
 router = APIRouter(
     prefix="/auth",
     tags=["auth"]
 )
 
-fake_users_db = {}
-
 
 @router.post("/signup")
-def signup(data: SignupRequest):
-    if data.username in fake_users_db:
-        return {"error": "User already exists"}
+async def signup(
+    data: SignupRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    existing_user = await crud.get_user_by_username(
+        db, data.username
+    )
+
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="User already exists",
+        )
 
     password_hash = hash_password(data.password)
 
-    fake_users_db[data.username] = {
-        "username": data.username,
-        "password_hash": password_hash,
-    }
+    await crud.create_user(
+        db,
+        username=data.username,
+        password_hash=password_hash,
+    )
 
-    return {
-        "message": f"user {data.username} created"
-    }
+    return {"message": "User created"}
 
 
 @router.post("/login")
-def login(data: LoginRequest):
-    user = fake_users_db.get(data.username)
+async def login(
+    data: LoginRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    user = await crud.get_user_by_username(
+        db, data.username
+    )
 
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+        )
 
-    if not verify_password(data.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not verify_password(
+        data.password,
+        user.password_hash,
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+        )
 
     access_token = create_access_token(
-        data={"sub": user["username"]}
+        data={"sub": user.username}
     )
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
     }
 
 
 # for test only - delete later
 @router.get("/_debug/users")
-def list_users():
-    return fake_users_db
+async def list_users(
+    db: AsyncSession = Depends(get_db),
+):
+    return await crud.get_all_users(db)
 
 
 @router.get("/me")
