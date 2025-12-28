@@ -1,83 +1,116 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from typing import List
 
+from app.database import get_db
 from app.auth.security import get_current_user
+from app.auth.crud import get_user_by_username
 from app.todos.schemas import TodoCreate, TodoUpdate, TodoOut
+from app.todos import crud
+from app.categories.crud import get_category_by_id
+
 
 router = APIRouter(
     prefix="/todos",
-    tags=["todos"]
+    tags=["todos"],
 )
-
-fake_todos_db = {}
-todo_id_counter = 1
 
 
 @router.post("/", response_model=TodoOut)
 def create_todo(
     data: TodoCreate,
-    username: str = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    username: str = Depends(get_current_user),
 ):
-    global todo_id_counter
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid user")
 
-    user_todos = fake_todos_db.setdefault(username, [])
+    if data.category_id is not None:
+        category = get_category_by_id(
+            db,
+            category_id=data.category_id,
+            user=user,
+        )
+        if not category:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid category",
+            )
 
-    todo = {
-        "id": todo_id_counter,
-        "title": data.title,
-        "description": data.description or "",
-        "completed": False,
-        "category_id": data.category_id,
-        "due_date": data.due_date,
-    }
-
-    todo_id_counter += 1
-    user_todos.append(todo)
-
-    return todo
+    return crud.create_todo(
+        db,
+        user=user,
+        title=data.title,
+        description=data.description or "",
+        category_id=data.category_id,
+        due_date=data.due_date,
+    )
 
 
 @router.get("/", response_model=List[TodoOut])
-def list_todos(username: str = Depends(get_current_user)):
-    return fake_todos_db.get(username, [])
+def list_todos(
+    db: Session = Depends(get_db),
+    username: str = Depends(get_current_user),
+):
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid user")
+
+    return crud.get_todos_for_user(db, user)
 
 
 @router.patch("/{todo_id}", response_model=TodoOut)
 def update_todo(
     todo_id: int,
     data: TodoUpdate,
-    username: str = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    username: str = Depends(get_current_user),
 ):
-    todos = fake_todos_db.get(username, [])
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid user")
 
-    for todo in todos:
-        if todo["id"] == todo_id:
-            if data.title is not None:
-                todo["title"] = data.title
-            if data.description is not None:
-                todo["description"] = data.description
-            if data.completed is not None:
-                todo["completed"] = data.completed
-            if data.category_id is not None:
-                todo["category_id"] = data.category_id
-            if data.due_date is not None:
-                todo["due_date"] = data.due_date
+    todo = crud.get_todo_by_id(
+        db,
+        todo_id=todo_id,
+        user=user,
+    )
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
 
-            return todo
+    if data.category_id is not None:
+        category = get_category_by_id(
+            db,
+            category_id=data.category_id,
+            user=user,
+        )
+        if not category:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid category",
+            )
 
-    raise HTTPException(status_code=404, detail="Todo not found")
+    return crud.update_todo(db, todo=todo, data=data)
 
 
 @router.delete("/{todo_id}")
 def delete_todo(
     todo_id: int,
-    username: str = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    username: str = Depends(get_current_user),
 ):
-    todos = fake_todos_db.get(username, [])
+    user = get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid user")
 
-    for i, todo in enumerate(todos):
-        if todo["id"] == todo_id:
-            todos.pop(i)
-            return {"message": "Todo deleted"}
+    todo = crud.get_todo_by_id(
+        db,
+        todo_id=todo_id,
+        user=user,
+    )
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
 
-    raise HTTPException(status_code=404, detail="Todo not found")
+    crud.delete_todo(db, todo=todo)
+    return {"message": "Todo deleted"}

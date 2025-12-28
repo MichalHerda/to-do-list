@@ -48,6 +48,65 @@ Currently supported:
 
 Database connection is configured via `.env` file.
 
+## PostgreSQL Setup (Optional, recommended for production)
+
+If you want to use PostgreSQL (recommended), make sure it is installed and running:
+
+### Install PostgreSQL
+
+#### Ubuntu/Debian
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+
+Create the database and user
+
+# Switch to postgres user
+
+```
+sudo -i -u postgres
+```
+
+# Open psql shell
+
+```
+psql
+```
+
+# Create database
+
+```
+CREATE DATABASE todo_db;
+```
+
+# Create user (replace 'username' and 'password')
+
+```
+CREATE USER username WITH PASSWORD 'password';
+```
+
+# Grant privileges
+
+```
+GRANT ALL PRIVILEGES ON DATABASE todo_db TO username;
+```
+
+# Exit psql
+
+```
+\q
+exit
+```
+
+Then update your .env file:
+
+```
+DATABASE_URL=postgresql://username:password@localhost:5432/todo_db
+SECRET_KEY=your-secret-key
+```
+
 ## Environment variables
 
 Create a `.env` file in `/back`:
