@@ -1,21 +1,21 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
+from sqlalchemy.orm import Session
+from sqlalchemy import select                   # noqa
 from app.models import User
 
 
-async def get_user_by_username(
-    db: AsyncSession,
+def get_user_by_username(
+    db: Session,
     username: str,
 ) -> User | None:
-    result = await db.execute(
-        select(User).where(User.username == username)
+    return (
+        db.query(User)
+        .filter(User.username == username)
+        .first()
     )
-    return result.scalar_one_or_none()
 
 
-async def create_user(
-    db: AsyncSession,
+def create_user(
+    db: Session,
     username: str,
     password_hash: str,
 ) -> User:
@@ -25,12 +25,11 @@ async def create_user(
     )
 
     db.add(user)
-    await db.commit()
-    await db.refresh(user)
+    db.commit()
+    db.refresh(user)
 
     return user
 
 
-async def get_all_users(db: AsyncSession):
-    result = await db.execute(select(User))
-    return result.scalars().all()
+def get_all_users(db: Session):
+    return db.query(User).all()

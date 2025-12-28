@@ -1,31 +1,29 @@
-from fastapi import APIRouter, HTTPException
+from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, Depends
+
 from app.auth.schemas import SignupRequest, LoginRequest
 from app.auth.security import (
     hash_password,
     verify_password,
-    create_access_token
+    create_access_token,
+    get_current_user,
 )
-
-from fastapi import Depends
-from app.auth.security import get_current_user
-
-from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.auth import crud
 
 
 router = APIRouter(
     prefix="/auth",
-    tags=["auth"]
+    tags=["auth"],
 )
 
 
 @router.post("/signup")
-async def signup(
+def signup(
     data: SignupRequest,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    existing_user = await crud.get_user_by_username(
+    existing_user = crud.get_user_by_username(
         db, data.username
     )
 
@@ -37,7 +35,7 @@ async def signup(
 
     password_hash = hash_password(data.password)
 
-    await crud.create_user(
+    crud.create_user(
         db,
         username=data.username,
         password_hash=password_hash,
@@ -47,21 +45,15 @@ async def signup(
 
 
 @router.post("/login")
-async def login(
+def login(
     data: LoginRequest,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
 ):
-    user = await crud.get_user_by_username(
+    user = crud.get_user_by_username(
         db, data.username
     )
 
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials",
-        )
-
-    if not verify_password(
+    if not user or not verify_password(
         data.password,
         user.password_hash,
     ):
@@ -80,12 +72,12 @@ async def login(
     }
 
 
-# for test only - delete later
+# for test - delete later:
 @router.get("/_debug/users")
-async def list_users(
-    db: AsyncSession = Depends(get_db),
+def list_users(
+    db: Session = Depends(get_db),
 ):
-    return await crud.get_all_users(db)
+    return crud.get_all_users(db)
 
 
 @router.get("/me")

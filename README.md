@@ -22,8 +22,21 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - FastAPI
 - Pydantic models & validation
 - SQLite/PostgreSQL support via environment variables
-- Async CRUD operations
-- SQLAlchemy ORM (async)
+- SQLAlchemy ORM (sync)
+- Alembic migrations
+- JWT authentication
+- Versioned database schema
+- PostgreSQL used for development
+
+## Architecture Notes
+
+The project currently uses synchronous SQLAlchemy sessions.
+This decision was made intentionally to avoid mixing sync and async layers,
+which can lead to subtle runtime errors.
+
+The architecture allows future refactoring to full async
+(FastAPI async routes + AsyncSession) as a separate step.
+
 
 ## Database
 
