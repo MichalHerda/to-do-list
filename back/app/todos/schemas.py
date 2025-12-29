@@ -25,3 +25,6 @@ class TodoOut(BaseModel):
     completed: bool
     category_id: Optional[int]
     due_date: Optional[datetime]
+
+    class Config:
+        orm_mode = True

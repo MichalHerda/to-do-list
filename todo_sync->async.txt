@@ -1,0 +1,86 @@
+TEKST DO SKOPIOWANIA DO .txt
+
+(możesz go wkleić do nowej sesji ChatGPT)
+
+Problem async vs sync w FastAPI + SQLAlchemy (case study)
+
+W projekcie FastAPI początkowo zastosowano asynchroniczne podejście:
+
+async def w routerach
+
+AsyncSession z SQLAlchemy
+
+async CRUD (async def, await)
+
+Problem pojawił się, gdy:
+
+część aplikacji była sync (router, dependency injection),
+
+a część async (CRUD, DB session).
+
+Efektem były błędy:
+
+coroutine was never awaited
+
+'coroutine' object has no attribute ...
+
+nieprawidłowe warunki logiczne (if coroutine: zawsze true)
+
+MissingGreenlet przy Alembicu
+
+Dlaczego to się stało?
+
+FastAPI nie wymusza spójności sync/async.
+Można technicznie:
+
+wywołać async funkcję z sync kodu
+
+ale bez await zwróci ona coroutine, nie wynik
+
+Coroutine:
+
+jest obiektem truthy
+
+NIE wykonuje zapytania do DB
+
+psuje logikę aplikacji
+
+Kluczowa zasada
+
+Nie wolno mieszać:
+
+sync router + async CRUD
+
+async router + sync DB
+
+Zawsze:
+
+SYNC → wszystko sync
+
+ASYNC → wszystko async
+
+Dlaczego wybrano sync jako rozwiązanie tymczasowe?
+
+Sync SQLAlchemy jest prostsze
+
+Jest w pełni produkcyjne
+
+Obsługuje wielu użytkowników równolegle
+
+Nadaje się idealnie do CRUD / auth / REST API
+
+Async zostaje odłożony do osobnego etapu refaktoryzacji.
+
+Wniosek
+
+Przejście z fake DB na prawdziwą bazę ujawnia problemy architektury.
+To normalny etap nauki backendu.
+Sync nie czyni aplikacji „nieprodukcyjną”.
+
+Pliki objęte zmianą
+
+app/database.py
+
+app/auth/crud.py
+
+app/auth/router.py

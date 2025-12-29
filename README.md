@@ -22,7 +22,97 @@ React + FastAPI — Classic CRUD (Fullstack ToDo App)  A modular full-stack proj
 - FastAPI
 - Pydantic models & validation
 - SQLite/PostgreSQL support via environment variables
-- Async CRUD operations
+- SQLAlchemy ORM (sync)
+- Alembic migrations
+- JWT authentication
+- Versioned database schema
+- PostgreSQL used for development
+
+## Architecture Notes
+
+The project currently uses synchronous SQLAlchemy sessions.
+This decision was made intentionally to avoid mixing sync and async layers,
+which can lead to subtle runtime errors.
+
+The architecture allows future refactoring to full async
+(FastAPI async routes + AsyncSession) as a separate step.
+
+
+## Database
+
+The backend supports multiple databases via environment configuration.
+
+Currently supported:
+- SQLite (default, local dev)
+- PostgreSQL (recommended for production & learning)
+
+Database connection is configured via `.env` file.
+
+## PostgreSQL Setup (Optional, recommended for production)
+
+If you want to use PostgreSQL (recommended), make sure it is installed and running:
+
+### Install PostgreSQL
+
+#### Ubuntu/Debian
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+
+Create the database and user
+
+# Switch to postgres user
+
+```
+sudo -i -u postgres
+```
+
+# Open psql shell
+
+```
+psql
+```
+
+# Create database
+
+```
+CREATE DATABASE todo_db;
+```
+
+# Create user (replace 'username' and 'password')
+
+```
+CREATE USER username WITH PASSWORD 'password';
+```
+
+# Grant privileges
+
+```
+GRANT ALL PRIVILEGES ON DATABASE todo_db TO username;
+```
+
+# Exit psql
+
+```
+\q
+exit
+```
+
+Then update your .env file:
+
+```
+DATABASE_URL=postgresql://username:password@localhost:5432/todo_db
+SECRET_KEY=your-secret-key
+```
+
+## Environment variables
+
+Create a `.env` file in `/back`:
+
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/todo_db
+SECRET_KEY=your-secret-key
 
 ## Setup & Run
 
