@@ -6,6 +6,8 @@ from app.auth.security import (
     hash_password,
     verify_password,
     create_access_token,
+    create_refresh_token,
+    refresh_access_token,
     get_current_user,
 )
 from app.database import get_db
@@ -45,31 +47,31 @@ def signup(
 
 
 @router.post("/login")
-def login(
-    data: LoginRequest,
-    db: Session = Depends(get_db),
-):
-    user = crud.get_user_by_username(
-        db, data.username
-    )
+def login(data: LoginRequest, db: Session = Depends(get_db)):
+    user = crud.get_user_by_username(db, data.username)
 
-    if not user or not verify_password(
-        data.password,
-        user.password_hash,
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials",
-        )
+    if not user or not verify_password(data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    access_token = create_access_token(
-        data={"sub": user.username}
-    )
+    access_token = create_access_token({"sub": user.username})
 
-    return {
+    response = {
         "access_token": access_token,
         "token_type": "bearer",
     }
+
+    if data.stay_logged_in:
+        response["refresh_token"] = create_refresh_token(
+            {"sub": user.username}
+        )
+
+    return response
+
+
+@router.post("/refresh")
+def refresh(refresh_token: str):
+    access_token = refresh_access_token(refresh_token)
+    return {"access_token": access_token}
 
 
 # for test - delete later:

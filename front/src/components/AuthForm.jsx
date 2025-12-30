@@ -13,22 +13,59 @@ function AuthForm({ onAuthSuccess }) {
 
   const API_URL = 'http://localhost:8000'
 
-const handleSubmit = async (e) => {
-  e.preventDefault()
-  setError({})
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError({})
 
-  // WALIDACJE PODSTAWOWE
-  if (!username.trim()) return setError({ username: 'Username is required' })
-  if (!password) return setError({ password: 'Password is required' })
-  if (!isLogin && password.length < 5)
-    return setError({ password: 'Password must be at least 5 characters' })
-  if (!isLogin && password !== confirmPassword)
-    return setError({ confirmPassword: 'Passwords do not match' })
+    // BASIC VALIDATION
+    if (!username.trim()) return setError({ username: 'Username is required' })
+    if (!password) return setError({ password: 'Password is required' })
+    if (!isLogin && password.length < 5)
+      return setError({ password: 'Password must be at least 5 characters' })
+    if (!isLogin && password !== confirmPassword)
+      return setError({ confirmPassword: 'Passwords do not match' })
 
-  // LOGIN
-  if (isLogin) {
+    // LOGIN
+    if (isLogin) {
+      try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            stay_logged_in: stayLoggedIn,
+          }),
+        })
+
+        if (!res.ok) {
+          throw new Error('Invalid credentials')
+        }
+
+        const data = await res.json()
+
+        // SAVE TOKENS
+        localStorage.setItem('access_token', data.access_token)
+
+        if (data.refresh_token) {
+          localStorage.setItem('refresh_token', data.refresh_token)
+        } else {
+          localStorage.removeItem('refresh_token')
+        }
+
+        onAuthSuccess?.(username)
+      } catch (err) {
+        setError({ password: 'Invalid username or password' })
+      }
+
+      return
+    }
+
+    // SIGNUP
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,60 +74,33 @@ const handleSubmit = async (e) => {
       })
 
       if (!res.ok) {
-        // backend odpowiada np. 401
-        throw new Error('Invalid credentials')
+        const data = await res.json()
+        throw new Error(data.detail || 'Signup failed')
       }
 
-      const data = await res.json()
+      // AUTO LOGIN AFTER SIGNUP
+      const loginRes = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          stay_logged_in: false,
+        }),
+      })
 
-      // ZAPIS JWT
-      localStorage.setItem('access_token', data.access_token)
+      const loginData = await loginRes.json()
 
-      // PRZEKAZUJEMY STAN DO APP.JSX
+      localStorage.setItem('access_token', loginData.access_token)
+      localStorage.removeItem('refresh_token')
+
       onAuthSuccess?.(username)
-
     } catch (err) {
-      setError({ password: 'Invalid username or password' })
+      setError({ username: err.message })
     }
-    return
   }
-// SIGNUP
-if (!isLogin) {
-  try {
-    const res = await fetch(`${API_URL}/auth/signup`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    })
-
-    if (!res.ok) {
-      const data = await res.json()
-      throw new Error(data.error || 'Signup failed')
-    }
-
-    // opcjonalnie: od razu zaloguj po signupie
-    const loginRes = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    })
-
-    const loginData = await loginRes.json()
-    localStorage.setItem('access_token', loginData.access_token)
-
-    onAuthSuccess?.(username)
-
-  } catch (err) {
-    setError({ username: err.message })
-  }
-}
-
-  
-}
 
   const resetForm = () => {
     setUsername('')
@@ -104,7 +114,9 @@ if (!isLogin) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <h2 className="text-center text-2xl font-bold">{isLogin ? 'Login' : 'Sign up'}</h2>
+      <h2 className="text-center text-2xl font-bold">
+        {isLogin ? 'Login' : 'Sign up'}
+      </h2>
 
       <input
         type="text"
@@ -115,7 +127,9 @@ if (!isLogin) {
           error.username ? 'border-red-500' : 'border-gray-600'
         } bg-gray-900 text-white`}
       />
-      {error.username && <div className="text-red-500 text-sm">{error.username}</div>}
+      {error.username && (
+        <div className="text-red-500 text-sm">{error.username}</div>
+      )}
 
       <div className="relative">
         <input
@@ -135,7 +149,9 @@ if (!isLogin) {
           {showPassword ? '🙈' : '👁️'}
         </button>
       </div>
-      {error.password && <div className="text-red-500 text-sm">{error.password}</div>}
+      {error.password && (
+        <div className="text-red-500 text-sm">{error.password}</div>
+      )}
 
       {!isLogin && (
         <div className="relative">
@@ -157,7 +173,11 @@ if (!isLogin) {
           </button>
         </div>
       )}
-      {error.confirmPassword && <div className="text-red-500 text-sm">{error.confirmPassword}</div>}
+      {error.confirmPassword && (
+        <div className="text-red-500 text-sm">
+          {error.confirmPassword}
+        </div>
+      )}
 
       {isLogin && (
         <label className="flex items-center gap-2 text-gray-400 text-sm">

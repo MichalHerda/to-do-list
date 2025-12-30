@@ -9,6 +9,7 @@ class SignupRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+    stay_logged_in: bool = False
 
 
 class AuthResponse(BaseModel):
